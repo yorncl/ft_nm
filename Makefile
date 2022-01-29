@@ -1,17 +1,20 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -fsanitize=address
-LDFLAGS =
+LDFLAGS = -L ./lib/libft -lft
 SRC = $(wildcard src/*.c)
 OBJ = $(SRC:%.c=%.o)
 HEADERS = $(wildcard src/.h)
 NAME = ft_nm
-INC =
+INC = -I ./lib/libft
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $^ -o $@ $(LDFLAGS) $(INC)  
 
-$(NAME): $(OBJ)
+$(NAME): $(OBJ) libs
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME) $(LDFLAGS) $(INC)  
+
+libs:
+	$(MAKE) -C lib/libft
 
 all: $(NAME)
 
