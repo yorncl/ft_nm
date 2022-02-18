@@ -1,8 +1,9 @@
 #ifndef ELF_H
 #define ELF_H
 
-#define MAGIC_NUMBER 0x7f454c46 // 0x7f followed by E L F
+#include <stdint.h>
 
+#define MAGIC_NUMBER 0x7f454c46 // 0x7f followed by E L F
 
 #pragma pack(push, 1)
 /* Type for a 16-bit quantity.  */
@@ -31,7 +32,10 @@ typedef uint16_t Elf64_Section;
 typedef Elf32_Half Elf32_Versym;
 typedef Elf64_Half Elf64_Versym;
 
-#include <stdint.h>
+enum {
+	EI_NIDENT = 16
+};
+
 typedef struct
 {
   unsigned char     e_ident[EI_NIDENT];        /* Magic number and other info */
@@ -49,6 +53,7 @@ typedef struct
   Elf32_Half        e_shnum;                /* Section header table entry count */
   Elf32_Half        e_shstrndx;                /* Section header string table index */
 } Elf32_Ehdr;
+
 typedef struct
 {
   unsigned char     e_ident[EI_NIDENT];        /* Magic number and other info */
@@ -67,5 +72,8 @@ typedef struct
   Elf64_Half        e_shstrndx;                /* Section header string table index */
 } Elf64_Ehdr;
 #pragma pack(pop)
+
+#include "map_file.h"
+int validate_elf(struct mfile* mf);
 
 #endif

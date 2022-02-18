@@ -10,7 +10,7 @@ INC = -I ./lib/libft
 %.o: %.c
 	$(CC) $(CFLAGS) -c $^ -o $@ $(LDFLAGS) $(INC)  
 
-$(NAME): $(OBJ) libs
+$(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME) $(LDFLAGS) $(INC)  
 
 libs:
