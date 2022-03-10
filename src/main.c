@@ -2,7 +2,12 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include "map_file.h"
-#include "display_file.h"
+
+static int display_file(struct mfile* mf)
+{
+	(void) mf;	
+	return 0;
+}
 
 int main(int ac, char** av)
 {

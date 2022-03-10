@@ -8,7 +8,7 @@ import sys
 
 
 #Local imports
-from utils import bcolors
+from utils import bcolors, cprint, eprint
 import tests
 
 # Config default, change them if you need it
@@ -25,12 +25,6 @@ banner = """
         |_____|              by mclaudel 
 """
 
-def cprint(color, string):
-    print(color, string, bcolors.ENDC)
-
-def eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
-
 if __name__ == "__main__":
     print(banner)
     # Assuming that the parent directory is the project's directory
@@ -46,10 +40,7 @@ if __name__ == "__main__":
         eprint("Error while running make : ")
         eprint(err)
     print(bcolors.OKGREEN, "Make ran successfully")
-
-    paths = ["path1", "path2", "path3", "path4"]
-    for p in paths:
-        tests.run_test(p)
+    tests.run_tests()
     
     
 

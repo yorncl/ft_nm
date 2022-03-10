@@ -1,4 +1,5 @@
 *.o
 ft_nm
 *.swp
+__pycache__
 

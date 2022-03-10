@@ -1,3 +1,4 @@
+import sys
 
 class bcolors:
     HEADER = '\033[95m'
@@ -9,3 +10,10 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+
+def cprint(color, string):
+    print(color, string, bcolors.ENDC)
+
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+

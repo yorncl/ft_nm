@@ -28,5 +28,8 @@ fclean: clean
 
 re: fclean all
 
+test:
+	python3 test/main.py
 
-.PHONY: all clean fclean re
+
+.PHONY: all clean fclean re test
