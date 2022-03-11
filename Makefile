@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -g -fsanitize=address
 LDFLAGS = -L ./lib/libft -lft
 SRC = $(wildcard src/*.c)
 OBJ = $(SRC:%.c=%.o)

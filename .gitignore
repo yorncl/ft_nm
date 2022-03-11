@@ -2,4 +2,5 @@
 ft_nm
 *.swp
 __pycache__
+*.out
 

@@ -1,13 +1,44 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include <libft.h>
 #include "map_file.h"
+#include "elf.h"
+#include "read_elf.h"
 
 static int display_file(struct mfile* mf)
 {
-	(void) mf;	
-	return 0;
+	if (mf->size < sizeof(Elf32_Ehdr))
+		return -1;
+	Elf32_Ehdr* tmp = (Elf32_Ehdr*)mf->data;
+
+	// Check MAGIC NUMBER
+	uint8_t magic[4] = { 0x7f, 'E', 'L', 'F' };
+	if (ft_memcmp(tmp, magic, 4))
+	{
+		printf("This is not an elf file !!! \n");
+		return -1;
+	}
+
+	unsigned int class = tmp->e_ident[4];
+	int r;
+	switch (class)
+	{
+		case 1:
+			r = read_x86(mf);
+			break;
+		case 2:
+			r = read_ia64(mf);
+			break;
+		default:
+			printf("Class not supported\n");
+			r = -1;
+
+	}
+	return r;
 }
+
 
 int main(int ac, char** av)
 {
