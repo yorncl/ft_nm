@@ -4,3 +4,4 @@ ft_nm
 __pycache__
 *.out
 
+.cache

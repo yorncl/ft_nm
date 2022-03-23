@@ -1,0 +1,98 @@
+[
+    {
+        "arguments": [
+            "gcc",
+            "-c",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-I",
+            "./lib/libft",
+            "-o",
+            "src/sym_list.o",
+            "src/sym_list.c"
+        ],
+        "directory": "/home/yorn/Documents/ft_nm",
+        "file": "src/sym_list.c"
+    },
+    {
+        "arguments": [
+            "gcc",
+            "-c",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-I",
+            "./lib/libft",
+            "-o",
+            "src/map_file.o",
+            "src/map_file.c"
+        ],
+        "directory": "/home/yorn/Documents/ft_nm",
+        "file": "src/map_file.c"
+    },
+    {
+        "arguments": [
+            "gcc",
+            "-c",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-I",
+            "./lib/libft",
+            "-o",
+            "src/main.o",
+            "src/main.c"
+        ],
+        "directory": "/home/yorn/Documents/ft_nm",
+        "file": "src/main.c"
+    },
+    {
+        "arguments": [
+            "gcc",
+            "-c",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-I",
+            "./lib/libft",
+            "-o",
+            "src/utils.o",
+            "src/utils.c"
+        ],
+        "directory": "/home/yorn/Documents/ft_nm",
+        "file": "src/utils.c"
+    },
+    {
+        "arguments": [
+            "gcc",
+            "-c",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-I",
+            "./lib/libft",
+            "-o",
+            "src/x64.o",
+            "src/x64.c"
+        ],
+        "directory": "/home/yorn/Documents/ft_nm",
+        "file": "src/x64.c"
+    },
+    {
+        "arguments": [
+            "gcc",
+            "-c",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-I",
+            "./lib/libft",
+            "-o",
+            "src/x86_32.o",
+            "src/x86_32.c"
+        ],
+        "directory": "/home/yorn/Documents/ft_nm",
+        "file": "src/x86_32.c"
+    }
+]
