@@ -2,10 +2,7 @@
 #include <stdio.h>
 #include <sys/mman.h>
 #include <unistd.h>
-#include <libft.h>
-#include "map_file.h"
-#include "elf.h"
-#include "read_elf.h"
+#include "ft_nm.h"
 
 static int display_file(struct mfile* mf)
 {
@@ -23,19 +20,21 @@ static int display_file(struct mfile* mf)
 
 	unsigned int class = tmp->e_ident[4];
 	int r;
+	t_list* symlist = NULL;
 	switch (class)
 	{
 		case 1:
-			r = read_x86(mf);
+			//symlist = read_x86(mf);
 			break;
 		case 2:
-			r = read_ia64(mf);
+			symlist = read_ia64(mf);
 			break;
 		default:
 			printf("Class not supported\n");
 			r = -1;
 
 	}
+	sl_print(symlist);
 	return r;
 }
 

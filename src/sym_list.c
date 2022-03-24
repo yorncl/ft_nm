@@ -1,6 +1,6 @@
-#include "sym_list.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "ft_nm.h"
 
 void sl_push_back(t_list** sl, u_int64_t value, char type, char *name)
 {
@@ -29,7 +29,7 @@ void sl_print(t_list* sl)
 	while (sl)
 	{
 		data = (sl_entry*)sl->content;
-		printf("%lX %c %s\b", data->value, data->type, data->name);
+		printf("%lX %c %s\n", data->value, data->type, data->name);
 		sl = sl->next;
 	}
 }

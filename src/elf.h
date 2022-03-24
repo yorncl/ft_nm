@@ -120,5 +120,35 @@ typedef struct elf64_sym {
 } Elf64_Sym;
 
 
+// This values are to analyse the type of the symbol, through st_info and st_other
+#define STT_NOTYPE 0
+#define STT_OBJECT 1
+#define STT_FUNC 2
+#define STT_SECTION 3
+#define STT_FILE 4
+#define STT_COMMON 5
+#define STT_TLS 6
+#define STT_LOOS 10
+#define STT_HIOS 12
+#define STT_LOPROC 13
+#define STT_SPARC_REGISTER 13
+#define STT_HIPROC 15
+
+#define STV_DEFAULT 0
+#define STV_INTERNAL 1
+#define STV_HIDDEN 2
+#define STV_PROTECTED 3
+#define STV_EXPORTED 4
+#define STV_SINGLETON 5
+#define STV_ELIMINATE 6
+
+#define STB_LOCAL 0
+#define STB_GLOBAL 1
+#define STB_WEAK 2
+#define STB_LOOS 10
+#define STB_HIOS 12
+#define STB_LOPROC 13
+#define STB_HIPROC 15
+
 #pragma pack(pop)
 #endif

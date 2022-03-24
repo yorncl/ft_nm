@@ -1,10 +1,7 @@
-#include "elf.h"
-#include "read_elf.h"
-#include "utils.h"
-#include "map_file.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <libft.h>
+#include "ft_nm.h"
 
 Elf64_Shdr* find_strtab(Elf64_Shdr* s, int16_t n, char* names)// TODO check if 2 strtab ?
 {
@@ -20,24 +17,26 @@ Elf64_Shdr* find_strtab(Elf64_Shdr* s, int16_t n, char* names)// TODO check if 2
 	return NULL;
 }
 
-int print_symbols(Elf64_Shdr* symtab, Elf64_Shdr* strtab, struct mfile* mf)
+t_list* load_symbols(Elf64_Shdr* symtab, Elf64_Shdr* strtab, struct mfile* mf)
 {
+	char *str;
+	t_list* symlist = NULL;
 	// TODO check for alignement ?
 	int64_t nsym = symtab->sh_size / symtab->sh_entsize;
-	printf("entity size : %lu\n", symtab->sh_entsize);
 	Elf64_Sym* sentry = (Elf64_Sym*)(mf->data + symtab->sh_offset);
-	char *str;
+
 	while(nsym--)
 	{
-		str = (char*)(mf->data + strtab->sh_offset + sentry->st_name);
-		printf("%s\n", str);
+		str = &mf->data[strtab->sh_offset + sentry->st_name];
+		sl_push_back(&symlist, sentry->st_value, get_sym_type(sentry->st_info, sentry->st_other, sentry->st_shndx), str); 
 		sentry += 1;
 	}
-	return 0;
+	return symlist;
 }
 
-int read_ia64(struct mfile* mf)
+t_list* read_ia64(struct mfile* mf)
 {
+	t_list *symlist = NULL;
 	Elf64_Ehdr* h = (Elf64_Ehdr*)mf->data;
 
 	if (h->e_shstrndx == 0 ) // SHN_UNDEF
@@ -60,14 +59,11 @@ int read_ia64(struct mfile* mf)
 
 	for(int16_t i = 0; i < n; i++)
 	{
-		printf("Type of section %x\n", s[i].sh_type);
 		if (s[i].sh_type == SHT_SYMTAB)
 		{
-
-			printf("Value of %x\n", s[i].sh_type);
-			print_symbols(&s[i], strtab, mf);
+			symlist = load_symbols(&s[i], strtab, mf); // TODO manage multiple symtab
 		}
 	}
-	return 0;
+	return symlist;
 }
 
