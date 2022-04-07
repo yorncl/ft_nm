@@ -1,8 +1,6 @@
-#include "elf.h"
-#include "read_elf.h"
-#include "map_file.h"
+#include "ft_nm.h"
 
-int read_x86(struct mfile* mf)
+t_list* read_x86(struct mfile* mf)
 {
 	(void) mf;
 	return 0;

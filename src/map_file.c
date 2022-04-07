@@ -1,9 +1,9 @@
-#include "map_file.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h> 
 #include <sys/mman.h>
+#include "ft_nm.h"
 
 int map_file(char* file, struct mfile* mf)
 {
