@@ -1,4 +1,4 @@
-C = gcc
+CC = gcc
 CFLAGS = -Wall -Wextra -Werror -g 
 LDFLAGS = -L ./lib/libft -lft
 SRC = $(wildcard src/*.c)
