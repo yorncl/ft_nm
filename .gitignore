@@ -5,4 +5,3 @@ ft_nm
 *.dylib
 *.out
 *.dSYM
-lib/
