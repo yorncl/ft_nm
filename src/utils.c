@@ -1,77 +1,51 @@
 #include "nm.h"
+#include <stdint.h>
+#include <libft.h>
 
-uint8_t (*read8)(void* file) = 0;
-uint16_t (*read16)(void* file) = 0;
-uint32_t (*read32)(void* file) = 0;
-uint64_t (*read64)(void* file) = 0;
+uint16_t (*read16)(uint16_t* file) = 0;
+uint32_t (*read32)(uint32_t* file) = 0;
+uint64_t (*read64)(uint64_t* file) = 0;
 
 // TODO check for bounds ?
 
-uint64_t read64_little(void* addr)
+uint64_t read64_little(uint64_t* ptr)
 {
-	return *(uint32_t*)addr;
+	return *ptr;
 }
 
-uint32_t read32_little(void* addr)
+uint32_t read32_little(uint32_t* ptr)
 {
-	return *(uint32_t*)addr;
+	return *ptr;
 }
 
-uint16_t read16_little(void* addr)
+uint16_t read16_little(uint16_t* ptr)
 {
-	return *(uint16_t*)addr;
+	return *ptr;
 }
 
-uint8_t read8_little(void* addr)
+
+uint64_t read64_big(uint64_t* ptr)
 {
-	return *(uint8_t*)addr;
+	return ptr[0] << 56 | ptr[1] << 48 | ptr[2] << 40 | ptr[3] << 32 | ptr[4] << 24 | ptr[5] << 16 | ptr[6] << 8 | ptr[7];
 }
 
-uint64_t read64_big(void* addr)
+uint32_t read32_big(uint32_t* ptr)
 {
-	uint64_t ret = 0;
-	uint8_t* ptr = addr;
-	for (int i = 0; i < 8; i++)
-	{
-		ret <<= 8;
-		ret |= ptr[i];
-	}
-	return ret;
+	return ptr[0] << 24 | ptr[1] << 16 | ptr[2] << 8 | ptr[3];
 }
 
-uint32_t read32_big(void* addr)
+uint16_t read16_big(uint16_t* ptr)
 {
-	uint32_t ret = 0;
-	uint8_t* ptr = addr;
-	for (int i = 0; i < 4; i++)
-	{
-		ret <<= 8;
-		ret |= ptr[i];
-	}
-	return ret;
+	return  ptr[0] << 8 | ptr[1];
 }
 
-uint16_t read16_big(void* addr)
-{
-	uint16_t ret = 0;
-	uint8_t* ptr = addr;
-	for (int i = 0; i < 8; i++)
-	{
-		ret <<= 8;
-		ret |= ptr[i];
-	}
-	return ret;
-}
 
-uint8_t read8_big(void* addr)
+char compute_type(unsigned char st_info, unsigned char st_other, uint16_t st_shndx, char* sh_name, uint32_t sh_info, uint64_t sh_flags)
 {
-	uint8_t ret = 0;
-	uint8_t* ptr = addr;
-	for (int i = 0; i < 8; i++)
-	{
-		ret <<= 8;
-		ret |= ptr[i];
-	}
-	return ret;
+	ft_printf("st_info: %d, st_other: %d, sh_name: %s, sh_info: %d, sh_flags: %d\n", st_info, st_other, sh_name, sh_info, sh_flags);		
+
+	if (st_shndx == SHN_ABS)
+		return 0;
+	return '?';
 }
 
