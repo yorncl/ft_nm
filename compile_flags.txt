@@ -1,0 +1,3 @@
+-I./lib/libft/
+-L./lib/libft/
+-lft
