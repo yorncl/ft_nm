@@ -5,6 +5,8 @@ uint16_t (*read16)(void* file) = 0;
 uint32_t (*read32)(void* file) = 0;
 uint64_t (*read64)(void* file) = 0;
 
+// TODO check for bounds ?
+
 uint64_t read64_little(void* addr)
 {
 	return *(uint32_t*)addr;

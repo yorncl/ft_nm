@@ -3,8 +3,18 @@
 #include <libft.h>
 #include <stdint.h>
 
+// program header
+Elf64_Ehdr* filehdr;
+// section header
+Elf64_Shdr* sechdr; 
+// string table with symbols name
+char* strtab;
+// string table with section name
+char* shstrtab;
+// symbol table
+Elf64_Shdr* symtab;
 
-t_list* extract_symbols(void* file, Elf64_Shdr *sym_header, char* strings)
+t_list* extract_symbols(void* file, Elf64_Shdr* sym_header)
 {
 	Elf64_Sym *table = (void*)(file + read64(&sym_header->sh_offset));
 	uint64_t n = read64(&sym_header->sh_size) / read64(&sym_header->sh_entsize);
@@ -12,20 +22,32 @@ t_list* extract_symbols(void* file, Elf64_Shdr *sym_header, char* strings)
 	{
 		if (read32(&table[i].st_name) != 0)
 		{
-			ft_printf("%d: %s\n", i, strings + read32(&table[i].st_name));
+			ft_printf("%d: %s\n", i, strtab + read32(&table[i].st_name));
 		}
 	}
 	return NULL;
 }
 
-uint64_t get_str_table_offset(Elf64_Shdr* table, size_t n)
+char* get_section_name(Elf64_Shdr* sec)
 {
-	for (size_t i = 0; i < n; i++)
+	return shstrtab + read32(&sec->sh_name);
+}
+
+uint64_t identify_sections(void* file)
+{
+	size_t n = read16(&filehdr->e_shnum);
+	for (size_t i = 1; i < n; i++) // first entry is undefined
 	{
-		if (read32(&table[i].sh_type) == SHT_STRTAB)
+		uint32_t type = read32(&sechdr[i].sh_type);
+		if (type == SHT_STRTAB)
 		{
-			ft_printf("%d : string section at %x\n", i, read64(&table[i].sh_offset));
-			return read64(&table[i].sh_offset);
+			if (ft_strcmp(".strtab", get_section_name(&sechdr[i])) == 0)
+				strtab = (char*)file + read64(&sechdr[i].sh_offset);
+		}
+		if (type == SHT_SYMTAB) // TODO multiple symtab
+		{
+			if (ft_strcmp(".symtab", get_section_name(&sechdr[i])) == 0)
+				symtab = &sechdr[i];
 		}
 	}
 	return 0;
@@ -33,40 +55,30 @@ uint64_t get_str_table_offset(Elf64_Shdr* table, size_t n)
 
 int parse_elf_64(void* file)
 {
-	Elf64_Ehdr* header = file;
-	Elf64_Shdr* sec_table = file + read64(&header->e_shoff);
 	t_list* symbols = NULL;
 
-	uint64_t stroff = get_str_table_offset(sec_table, read16(&header->e_shnum));
-	// print offest
-	ft_printf("offset : %x\n", stroff);
-	ft_printf("offset : %u\n", stroff);
-	return 1;
-	if (stroff == 0)
+	// setting default values
+	filehdr = file;
+	sechdr = file + read64(&filehdr->e_shoff); // get the section header table
+	shstrtab = (char*)file + read64(&sechdr[read16(&filehdr->e_shstrndx)].sh_offset); // get the section names string table
+	strtab = 0;
+
+	// TODO check for missing sections
+
+	// identify other sections of interest
+	identify_sections(file);
+	if (strtab == NULL)
 	{
-		ft_printf("Error: no string table\n");
-		return 1;
+		ft_printf("no string table found\n"); // TODO stderr change message
+		return 0;
 	}
 
-	char* strings = file + stroff;
-	ft_printf("This is the address : %p and offset %x \n", strings, stroff);
-	for (int i = 0; i < 2000; i++)
+	if (symtab == NULL) // TODO handle multiples
 	{
-		ft_printf("%c", strings[i] == 0 ? ' ' : strings[i]);
-	}
-		ft_printf("\n");
-	return 1;
-
-	// print section types
-	for (int i = 0; i < read16(&header->e_shnum); i++)
-	{
-		ft_printf("section %d type : %x\n", i, read32(&sec_table[i].sh_type));
-		if (read32(&sec_table[i].sh_type) == SHT_SYMTAB)
-		{
-			ft_lstadd_back(&symbols, extract_symbols(file, &sec_table[i], file + stroff));
-		}
+		ft_printf("no symbol table found\n"); // TODO stderr change message
+		return 0;
 	}
 
-	ft_printf("value : %x\n", read64(&sec_table[1].sh_type));
+	ft_lstadd_back(&symbols, extract_symbols(file, symtab));
 	return 0;
 }

@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -g 
+CFLAGS = -Wall -Wextra -Werror 
 LDFLAGS = -L ./lib/libft -lft
 SRC = $(wildcard src/*.c)
 OBJ = $(SRC:%.c=%.o)
@@ -7,6 +7,10 @@ HEADERS = $(wildcard src/*.h)
 NAME = ft_nm
 INC = -I ./lib/libft
 LIBFT=lib/libft/libft.a
+
+ifdef DEBUG
+	CFLAGS += -g -fsanitize=address
+endif
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $^ -o $@ $(LDFLAGS) $(INC)
