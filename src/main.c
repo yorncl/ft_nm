@@ -56,6 +56,28 @@ int display_file(char *filename)
 		return 1;
 	}
 
+	// set correct read function depending on endianness
+	if (((Elf32_Ehdr*)file_ptr)->e_ident[EI_DATA] == ELFDATA2LSB)
+	{
+		read8 = read8_little;
+		read16 = read16_little;
+		read32 = read32_little;
+		read64 = read64_little;
+	}
+	else if (((Elf32_Ehdr*)file_ptr)->e_ident[EI_DATA] == ELFDATA2MSB)
+	{
+		read8 = read8_big;
+		read16 = read16_big;
+		read32 = read32_big;
+		read64 = read64_big;
+	}
+	else
+	{
+		ft_printf("Error: not little or big endian\n"); // TODO move to stderr TODO change message
+		return 1;
+	}
+	
+
 	int version = ((Elf32_Ehdr*)file_ptr)->e_ident[EI_CLASS] == ELFCLASS32 ? 0 : 1;
 	int r = 0;
 	if (version == 0)

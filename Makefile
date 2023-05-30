@@ -3,7 +3,7 @@ CFLAGS = -Wall -Wextra -Werror -g
 LDFLAGS = -L ./lib/libft -lft
 SRC = $(wildcard src/*.c)
 OBJ = $(SRC:%.c=%.o)
-HEADERS = $(wildcard src/.h)
+HEADERS = $(wildcard src/*.h)
 NAME = ft_nm
 INC = -I ./lib/libft
 LIBFT=lib/libft/libft.a
@@ -11,7 +11,7 @@ LIBFT=lib/libft/libft.a
 %.o: %.c
 	$(CC) $(CFLAGS) -c $^ -o $@ $(LDFLAGS) $(INC)
 
-$(NAME): $(OBJ) $(LIBFT)
+$(NAME): $(HEADERS) $(OBJ) $(LIBFT)
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME) $(LDFLAGS) $(INC)
 
 $(LIBFT):
