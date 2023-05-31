@@ -5,12 +5,21 @@
 
 #include "elf.h"
 
-typedef struct sym64
+typedef struct symbol_info
 {
-  Elf64_Sym* sym;
-  Elf64_Shdr* shdr;
-  char type;
-} sym64;
+  // ElfX_Sym fields
+  uint8_t st_info;
+  uint8_t st_other;
+  uint64_t st_value;
+  uint16_t st_shndx;
+  // infos of the corresponding section
+  uint32_t sh_flags;
+  uint64_t sh_type;
+  char* sh_name;
+  // Processed symbol fields
+  char* st_name;
+  char st_type;
+} symbol_info;
 
 int parse_elf_64(void*);
 
@@ -31,5 +40,6 @@ extern uint16_t (*read16)(uint16_t* file);
 extern uint32_t (*read32)(uint32_t* file);
 extern uint64_t (*read64)(uint64_t* file);
 
-char compute_type(unsigned char st_info, unsigned char st_other, uint16_t st_shndx, char* sh_name, uint32_t sh_info, uint64_t sh_flags);
+char* get_name(char* base, void* ptr);
+char compute_type(symbol_info* info); // sec_size is the size of a section, use to offset access
 #endif

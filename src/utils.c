@@ -1,4 +1,5 @@
 #include "nm.h"
+#include "elf.h"
 #include <stdint.h>
 #include <libft.h>
 
@@ -39,13 +40,41 @@ uint16_t read16_big(uint16_t* ptr)
 	return  ptr[0] << 8 | ptr[1];
 }
 
-
-char compute_type(unsigned char st_info, unsigned char st_other, uint16_t st_shndx, char* sh_name, uint32_t sh_info, uint64_t sh_flags)
+// This following functions send shivers down my spine
+// I don't know if I'm horrified or proud
+// Turns out that for Elf64_Sym and Elf32_Sym, the first 4 bytes are the same field
+// Same for Elf64_Shdr and Elf32_Shdr
+char* get_name(char* base, void* ptr)
 {
-	ft_printf("st_info: %d, st_other: %d, sh_name: %s, sh_info: %d, sh_flags: %d\n", st_info, st_other, sh_name, sh_info, sh_flags);		
+	return base + read32(ptr);
+}
 
-	if (st_shndx == SHN_ABS)
+char compute_type(symbol_info* info)
+{
+	uint8_t type = ELF_ST_TYPE(info->st_info);
+	uint8_t bind = ELF_ST_BIND(info->st_info);
+
+	// filter for sectiopn index
+	if (info->st_shndx == SHN_UNDEF)
+		return 'U';
+	if (info->st_shndx >= 0xff00) // TODO maybe we need more checks
 		return 0;
+	// now that the section index is valid, we can get the section name
+	if (info->sh_type == SHT_PROGBITS && info->sh_flags & SHF_ALLOC && info->sh_flags ^ SHF_WRITE)
+		return bind == STB_GLOBAL ? 'R' : 'r';	
+	if (ft_strcmp(".text", info->sh_name) == 0)
+		return bind == STB_GLOBAL ? 'T' : 't';
+	if (ft_strcmp(".bss", info->sh_name) == 0)
+		return bind == STB_GLOBAL ? 'B' : 'b';
+	if (info->sh_flags & SHF_ALLOC && info->sh_flags & SHF_WRITE)
+		return bind == STB_GLOBAL ? 'D' : 'd';
+	if (type == STT_COMMON)
+		return 'C';
+	else 
+	{
+		/* ft_printf("the current index %d\n", info->st_shndx); */
+		/* ft_printf("Section name : %s\n:", get_name(shstrtab, sec_base + info->st_shndx * sec_size)); */	
+	}
 	return '?';
 }
 
