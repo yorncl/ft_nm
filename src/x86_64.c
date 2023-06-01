@@ -1,7 +1,9 @@
 #include "nm.h"
 #include "elf.h"
 #include <libft.h>
+#include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <sys/types.h>
 
 // program header
@@ -13,27 +15,25 @@ char* strtab;
 // string table with section name
 char* shstrtab;
 
+size_t symcount;
 
 
 
-t_list* extract_symbols(void* file, Elf64_Shdr* sym_header)
+
+int extract_symbols(void* file, Elf64_Shdr* sym_header, symbol_info** symbols_array)
 {
 	Elf64_Sym* sentry = file + read64(&sym_header->sh_offset);
-	uint64_t n = read64(&sym_header->sh_size) / read64(&sym_header->sh_entsize);
-	t_list* symbols = NULL;
-	t_list* node;
 	symbol_info* symbol;
 
-	for (uint64_t i = 1; i < n; i++) // first entry is undefined
+	size_t j = 0;
+	for (uint64_t i = 1; i < symcount; i++) // skipping first entry
 	{
 		if (read32(&sentry[i].st_name) != 0)
 		{
 			symbol = ft_calloc(1, sizeof(symbol_info));
+			
 			if (symbol == NULL)
-			{
-				ft_lstclear(&symbols, free);
-				return NULL;
-			}
+				return 1; // TODO error handling
 			// Fill out the symbol info
 			symbol->st_info = sentry[i].st_info;
 			symbol->st_other = sentry[i].st_other;
@@ -49,28 +49,17 @@ t_list* extract_symbols(void* file, Elf64_Shdr* sym_header)
 			if (sentry[i].st_name != 0)
 				symbol->st_name = get_name(strtab, &sentry[i]); // TODO what happens if strtab is empty ?
 			else
-				symbol->st_name = NULL;
+				symbol->st_name = "";
 			symbol->st_type = compute_type(symbol);
-			if (symbol->st_type == 0) // no type --> discard
-			{
-				free(symbol);
-				continue;
-			}
-			// append to the list
-			node = ft_lstnew(symbol);
-			if (node == NULL)
-			{
-				free(symbol);
-				ft_lstclear(&symbols, free);
-				return NULL;
-			}
-			ft_lstadd_back(&symbols, node);
+			symbols_array[j] = symbol;
+			j++;
 		}
 	}
-	return symbols;
+	symcount = j;
+	return 0;
 }
 
-uint64_t identify_sections(void* file, t_list** symbol_tables)
+int identify_sections(void* file, Elf64_Shdr** symtab)
 {
 	size_t n = read16(&filehdr->e_shnum);
 	for (size_t i = 1; i < n; i++) // first entry is undefined
@@ -85,8 +74,10 @@ uint64_t identify_sections(void* file, t_list** symbol_tables)
 		{
 			if (ft_strcmp(".symtab", get_name(shstrtab, &sechdr[i])) == 0)
 			{
-				t_list* new = ft_lstnew(&sechdr[i]);
-				ft_lstadd_back(symbol_tables, new);
+				*symtab = &sechdr[i];
+				// TODO feels ugly, refactor ?
+				// TODO what about multiple .symtab sections
+				symcount += read64(&sechdr[i].sh_size) / read64(&sechdr[i].sh_entsize); 
 			}
 		}
 	}
@@ -95,53 +86,67 @@ uint64_t identify_sections(void* file, t_list** symbol_tables)
 
 int parse_elf_64(void* file)
 {
-	t_list* symbols = NULL;
-	t_list* symbol_tables = NULL;
+	symbol_info** symbols_array = NULL;
+	Elf64_Shdr* symtab = NULL;
+	symcount = 0;
 
 	// setting default values
+
 	filehdr = file;
-	sechdr = file + read64(&filehdr->e_shoff); // get the section header table
-	shstrtab = (char*)file + read64(&sechdr[read16(&filehdr->e_shstrndx)].sh_offset); // get the section names string table
+	// get the section header table
+	sechdr = file + read64(&filehdr->e_shoff);
+	// get the section names string table
+	shstrtab = (char*)file + read64(&sechdr[read16(&filehdr->e_shstrndx)].sh_offset);
 	strtab = NULL;
 
 	// TODO check for missing sections
 
 	// identify other sections of interest
-	identify_sections(file, &symbol_tables);
+	identify_sections(file, &symtab);
 	if (strtab == NULL)
 	{
 		ft_printf("no string table found\n"); // TODO stderr change message
 		return 0;
 	}
-	if (symbol_tables == NULL) // TODO handle multiples
+	if (symtab == NULL) // TODO handle multiples
 	{
 		ft_printf("no symbol table found\n"); // TODO stderr change message
 		return 0;
 	}
-	for (t_list* node = symbol_tables; node != NULL; node = node->next)
+
+
+	symbols_array = ft_calloc(symcount, sizeof(symbol_info*));
+	if (symbols_array == NULL)
+		return 1; // TODO error handling
+	if (extract_symbols(file, symtab, symbols_array))
 	{
-		t_list* curr = extract_symbols(file, node->content);
-		if (curr == NULL)
-		{
-			ft_lstclear(&symbols, free);
-			// TODO perror ?
-			return 1;
-		}
-		ft_lstadd_back(&symbols, curr);
+		for (size_t i = 0; symbols_array[i] != 0; i++)
+			free(symbols_array[i]);	
+		free(symbols_array);
+		ft_printf("Errororrorororor\n"); // TODO stderr change message
+		return 1;
 	}
 
+	// sorting symbols by name TODO maybe do the options for symbol size and whatnot
+	quick_sort(symbols_array, 0, symcount - 1, &compare_symbol_name);
+
 	// print symbols
-	for (t_list* node = symbols; node != NULL; node = node->next)
+	for (size_t i = 0; i < symcount; i++)
 	{
-		symbol_info* entry = node->content;
+		/* ft_printf("pointer value : %p\n", symbols_array[i]); */
+		symbol_info* entry = symbols_array[i];
+		if (entry->st_type == '?')
+			continue;
 		
 		if (entry->st_value != 0)
 			ft_printf("%016x %c %s\n", entry->st_value, entry->st_type, entry->st_name);
 		else
 			ft_printf("%16c %c %s\n", ' ', entry->st_type, entry->st_name);
-		/* ft_printf("Symbol name putain : %s\n", get_symbol_name(entry->sym)); */
 	}
-	ft_lstclear(&symbol_tables, 0);
-	ft_lstclear(&symbols, free);
+	// freeing everything
+	for (size_t i = 0; i < symcount; i++)
+		free(symbols_array[i]);	
+	free(symbols_array);
 	return 0;
 }
+

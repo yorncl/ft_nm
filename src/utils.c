@@ -55,10 +55,8 @@ char compute_type(symbol_info* info)
 	uint8_t bind = ELF_ST_BIND(info->st_info);
 
 	// filter for sectiopn index
-	if (info->st_shndx == SHN_UNDEF)
-		return 'U';
 	if (info->st_shndx >= 0xff00) // TODO maybe we need more checks
-		return 0;
+		return '?';
 	// now that the section index is valid, we can get the section name
 	if (info->sh_type == SHT_PROGBITS && info->sh_flags & SHF_ALLOC && info->sh_flags ^ SHF_WRITE)
 		return bind == STB_GLOBAL ? 'R' : 'r';	
@@ -70,11 +68,62 @@ char compute_type(symbol_info* info)
 		return bind == STB_GLOBAL ? 'D' : 'd';
 	if (type == STT_COMMON)
 		return 'C';
-	else 
-	{
-		/* ft_printf("the current index %d\n", info->st_shndx); */
-		/* ft_printf("Section name : %s\n:", get_name(shstrtab, sec_base + info->st_shndx * sec_size)); */	
-	}
+	if (info->st_shndx == SHN_UNDEF)
+		return 'U';
 	return '?';
 }
 
+#define ISALNUM(c) (('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9'))
+#define TOUPPER(c) ('a' <= c && c <= 'z' ? c - 32 : c)
+
+int compare_symbol_name(symbol_info* a, symbol_info* b)
+{
+	char *s1 = a->st_name;
+	char *s2 = b->st_name;
+	char c1, c2;
+	while (!ISALNUM(*s1))
+		s1++;
+	while (!ISALNUM(*s2)) // TODO testcase if it ignores all the non alphanum in comparison, even after first alphanum
+		s2++;
+	while (*s1 && *s2)
+	{
+		while (*s1 && !ISALNUM(*s1))
+			s1++;
+		while (*s2 && !ISALNUM(*s2))
+			s2++;
+		c1 = TOUPPER(*s1);
+		c2 = TOUPPER(*s2);
+		if (c1 != c2)
+			break;
+		s1++;
+		s2++;
+	}
+	if (*s1 == 0 && *s2 == 0)
+		return ft_strlen(a->st_name) > ft_strlen(b->st_name);
+	return TOUPPER(*s1) - TOUPPER(*s2) < 0;
+}
+
+void quick_sort(symbol_info** arr, int low, int high, int (*compare)(symbol_info*, symbol_info*))
+{
+	int top = low;
+	symbol_info* tmp;
+
+	for (int i = low; i < high; i++)
+	{
+		if (compare(arr[i], arr[high]))
+		{
+			tmp = arr[i];
+			arr[i] = arr[top];
+			arr[top] = tmp;
+			top++;
+		}
+	}
+	tmp = arr[top];
+	arr[top] = arr[high];
+	arr[high] = tmp;
+
+	if (top - 1 > low)
+		quick_sort(arr, low, top - 1, compare);
+	if (top + 1 < high)
+		quick_sort(arr, top + 1, high, compare);
+}

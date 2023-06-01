@@ -5,3 +5,5 @@ ft_nm
 *.dylib
 *.out
 *.dSYM
+symbols.ft
+symbols.nm

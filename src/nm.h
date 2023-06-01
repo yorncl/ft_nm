@@ -41,5 +41,7 @@ extern uint32_t (*read32)(uint32_t* file);
 extern uint64_t (*read64)(uint64_t* file);
 
 char* get_name(char* base, void* ptr);
+int compare_symbol_name(symbol_info* a, symbol_info* b);
+void quick_sort(symbol_info** arr, int low, int high, int (*compare)(symbol_info*, symbol_info*));
 char compute_type(symbol_info* info); // sec_size is the size of a section, use to offset access
 #endif
