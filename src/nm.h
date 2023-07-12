@@ -40,6 +40,10 @@ extern uint16_t (*read16)(uint16_t* file);
 extern uint32_t (*read32)(uint32_t* file);
 extern uint64_t (*read64)(uint64_t* file);
 
+// Other section/symbol flags that aren't in the ELF header from linux
+#define BSF_INDIRECT            (1 << 13)
+	
+
 char* get_name(char* base, void* ptr);
 int compare_symbol_name(symbol_info* a, symbol_info* b);
 void quick_sort(symbol_info** arr, int low, int high, int (*compare)(symbol_info*, symbol_info*));

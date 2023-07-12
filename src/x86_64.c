@@ -72,11 +72,11 @@ int identify_sections(void* file, Elf64_Shdr** symtab)
 		}
 		if (type == SHT_SYMTAB) // TODO multiple symtab
 		{
-			if (ft_strcmp(".symtab", get_name(shstrtab, &sechdr[i])) == 0)
+			if (ft_strcmp(".symtab", get_name(shstrtab, &sechdr[i])) == 0) 
 			{
 				*symtab = &sechdr[i];
 				// TODO feels ugly, refactor ?
-				// TODO what about multiple .symtab sections
+				// TODO what about multiple .symtab sections TODO yeah after reading the code of libbfd you can't really cut it
 				symcount += read64(&sechdr[i].sh_size) / read64(&sechdr[i].sh_entsize); 
 			}
 		}

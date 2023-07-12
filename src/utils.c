@@ -66,6 +66,7 @@ char compute_type(symbol_info* info)
 		return bind == STB_GLOBAL ? 'B' : 'b';
 	if (info->sh_flags & SHF_ALLOC && info->sh_flags & SHF_WRITE)
 		return bind == STB_GLOBAL ? 'D' : 'd';
+	
 	if (type == STT_COMMON)
 		return 'C';
 	if (info->st_shndx == SHN_UNDEF)
