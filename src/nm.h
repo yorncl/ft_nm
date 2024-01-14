@@ -43,6 +43,8 @@ extern uint64_t (*read64)(uint64_t* file);
 // Other section/symbol flags that aren't in the ELF header from linux
 #define BSF_INDIRECT            (1 << 13)
 	
+#define ISALNUM(c) (('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9'))
+#define TOUPPER(c) ('a' <= c && c <= 'z' ? c - 32 : c)
 
 char* get_name(char* base, void* ptr);
 int compare_symbol_name(symbol_info* a, symbol_info* b);

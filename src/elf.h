@@ -472,4 +472,50 @@ typedef struct elf64_note {
 /* Bits for GNU_PROPERTY_AARCH64_FEATURE_1_BTI */
 #define GNU_PROPERTY_AARCH64_FEATURE_1_BTI	(1U << 0)
 
+
+// Section flags
+
+#define SEC_NO_FLAGS                      0x0
+#define SEC_ALLOC                         0x1
+#define SEC_LOAD                          0x2
+#define SEC_RELOC                         0x4
+#define SEC_READONLY                      0x8
+#define SEC_CODE                         0x10
+#define SEC_DATA                         0x20
+#define SEC_ROM                          0x40
+#define SEC_CONSTRUCTOR                  0x80
+#define SEC_HAS_CONTENTS                0x100
+#define SEC_NEVER_LOAD                  0x200
+#define SEC_THREAD_LOCAL                0x400
+#define SEC_FIXED_SIZE                  0x800
+#define SEC_IS_COMMON                  0x1000
+#define SEC_DEBUGGING                  0x2000
+#define SEC_IN_MEMORY                  0x4000
+#define SEC_EXCLUDE                    0x8000
+#define SEC_SORT_ENTRIES              0x10000
+#define SEC_LINK_ONCE                 0x20000
+#define SEC_LINK_DUPLICATES           0xc0000
+#define SEC_LINK_DUPLICATES_DISCARD       0x0
+#define SEC_LINK_DUPLICATES_ONE_ONLY  0x40000
+#define SEC_LINK_DUPLICATES_SAME_SIZE 0x80000
+#define SEC_LINK_DUPLICATES_SAME_CONTENTS \
+  (SEC_LINK_DUPLICATES_ONE_ONLY | SEC_LINK_DUPLICATES_SAME_SIZE)
+#define SEC_LINKER_CREATED           0x100000
+#define SEC_ASSEMBLER_SECTION_ID     0x100000
+#define SEC_KEEP                     0x200000
+#define SEC_SMALL_DATA               0x400000
+#define SEC_MERGE                    0x800000
+#define SEC_STRINGS                 0x1000000
+#define SEC_GROUP                   0x2000000
+#define SEC_COFF_SHARED_LIBRARY     0x4000000
+#define SEC_ELF_REVERSE_COPY        0x4000000
+#define SEC_COFF_SHARED             0x8000000
+#define SEC_ELF_PURECODE            0x8000000
+#define SEC_TIC54X_BLOCK           0x10000000
+#define SEC_TIC54X_CLINK           0x20000000
+#define SEC_MEP_VLIW               0x20000000
+#define SEC_ELF_OCTETS             0x40000000
+#define SEC_COFF_NOREAD            0x40000000
+
+
 #endif /* _UAPI_LINUX_ELF_H */

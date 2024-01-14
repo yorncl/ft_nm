@@ -17,9 +17,6 @@ char* shstrtab;
 
 size_t symcount;
 
-
-
-
 int extract_symbols(void* file, Elf64_Shdr* sym_header, symbol_info** symbols_array)
 {
 	Elf64_Sym* sentry = file + read64(&sym_header->sh_offset);

@@ -24,7 +24,6 @@ uint16_t read16_little(uint16_t* ptr)
 	return *ptr;
 }
 
-
 uint64_t read64_big(uint64_t* ptr)
 {
 	return ptr[0] << 56 | ptr[1] << 48 | ptr[2] << 40 | ptr[3] << 32 | ptr[4] << 24 | ptr[5] << 16 | ptr[6] << 8 | ptr[7];
@@ -40,7 +39,7 @@ uint16_t read16_big(uint16_t* ptr)
 	return  ptr[0] << 8 | ptr[1];
 }
 
-// This following functions send shivers down my spine
+// This following function send shivers down my spine
 // I don't know if I'm horrified or proud
 // Turns out that for Elf64_Sym and Elf32_Sym, the first 4 bytes are the same field
 // Same for Elf64_Shdr and Elf32_Shdr
@@ -49,33 +48,39 @@ char* get_name(char* base, void* ptr)
 	return base + read32(ptr);
 }
 
-char compute_type(symbol_info* info)
+static char section_type(symbol_info* info)
 {
-	uint8_t type = ELF_ST_TYPE(info->st_info);
-	uint8_t bind = ELF_ST_BIND(info->st_info);
-
-	// filter for sectiopn index
-	if (info->st_shndx >= 0xff00) // TODO maybe we need more checks
-		return '?';
-	// now that the section index is valid, we can get the section name
-	if (info->sh_type == SHT_PROGBITS && info->sh_flags & SHF_ALLOC && info->sh_flags ^ SHF_WRITE)
-		return bind == STB_GLOBAL ? 'R' : 'r';	
-	if (ft_strcmp(".text", info->sh_name) == 0)
-		return bind == STB_GLOBAL ? 'T' : 't';
-	if (ft_strcmp(".bss", info->sh_name) == 0)
-		return bind == STB_GLOBAL ? 'B' : 'b';
-	if (info->sh_flags & SHF_ALLOC && info->sh_flags & SHF_WRITE)
-		return bind == STB_GLOBAL ? 'D' : 'd';
-	
-	if (type == STT_COMMON)
-		return 'C';
-	if (info->st_shndx == SHN_UNDEF)
-		return 'U';
+	uint32_t flags = info->sh_flags;
+	ft_printf("These are the flags : %x\n", flags);
+	if (flags & SEC_CODE)
+		return 't';
+	if (flags & SEC_DATA)
+	{
+		if (flags & SEC_READONLY)
+			return 'r';
+		else if (flags & SEC_SMALL_DATA)
+			return 'g';
+		else
+			return 'd';
+	}
+	if ((flags & SEC_HAS_CONTENTS) == 0)
+	{
+		if (flags & SEC_SMALL_DATA)
+			return 's';
+		else
+			return 'b';
+	}
+	if (flags & SEC_DEBUGGING)
+		return 'N';
+	if (flags & SEC_HAS_CONTENTS && flags & SEC_READONLY)
+		return 'n';
 	return '?';
 }
 
-#define ISALNUM(c) (('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9'))
-#define TOUPPER(c) ('a' <= c && c <= 'z' ? c - 32 : c)
+char compute_type(symbol_info* info)
+{
+	return section_type(info);
+}
 
 int compare_symbol_name(symbol_info* a, symbol_info* b)
 {
